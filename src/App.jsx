@@ -1,7 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+
 import Blog from './components/Blog'
+import LoginForm from './components/LoginForm'
+import NewBlogForm from './components/NewBlogForm'
+import Togglable from './components/Togglable'
 import ErrorNotification from './components/ErrorNotification'
 import SuccessNotification from './components/SuccessNotification'
+
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -16,6 +21,8 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setURL] = useState('')
+
+  const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -67,6 +74,9 @@ const App = () => {
         url: url
       }
 
+      // TODO: ToggleVisiblity when use brackets it returns undefined object
+      // but when run withotu them it doesn't run - look at fixing this for 5.5
+      blogFormRef.current.toggleVisbility
       await blogService.createNewBlog(newBlog)
       await blogService.getAll().then(blogs => setBlogs( blogs ))
 
@@ -80,24 +90,20 @@ const App = () => {
     } catch (exception) {
       setErrorMessage('New blog could not be created')
       setTimeout(() => {
-        setErrorMessaeg(null)}, 5000)
+        setErrorMessage(null)}, 5000)
     }
   }
 
   if (user === null) {
     return (
       <div>
-        <h2>Log in to application</h2>
-        <ErrorNotification message={errorMessage}/>
-        <form onSubmit = {handleLogin}>
-          <div>
-            username <input type="text" value={username} name="Username" onChange={({target}) => setUsername(target.value)}/>
-          </div>
-          <div>
-            password <input type="text" value={password} name="Passowrd" onChange={({target}) => setPassword(target.value)}/>
-          </div>
-          <button type = "Submit">login</button>
-        </form>
+        <LoginForm 
+          handleLogin={handleLogin} 
+          username={username} 
+          setUsername={setUsername} 
+          password={password} 
+          setPassword={setPassword}
+          errorMessage={errorMessage}/>
       </div>
     )
   }
@@ -109,15 +115,17 @@ const App = () => {
       <ErrorNotification message={errorMessage}/>
       <p>{user.name} is logged in <button onClick={handleLogout}>logout</button></p>
 
-      <h2>create new</h2>
-      <form onSubmit = {handleCreateNewBlog}>
-        <div>title: <input type="text" value={title} name="Title" onChange={({target}) => setTitle(target.value)} /></div>
-        <div>author: <input type="text" value={author} name="Author" onChange={({target}) => setAuthor(target.value)}/></div>
-        <div>url: <input type="text" value={url} name="URL" onChange={({target}) => setURL(target.value)}/></div>
-        <button type="Submit">create</button>
-      </form>
+      <Togglable buttonLabel="Create New Blog" ref={blogFormRef}>
+        <NewBlogForm 
+          handleCreateNewBlog={handleCreateNewBlog} 
+          title={title} 
+          setTitle={setTitle} 
+          author={author}
+          setAuthor={setAuthor}
+          url={url}
+          setURL={setURL} />
+        </Togglable>
 
-      <br></br>
       <br></br>
       {blogs.map(blog => <Blog key={blog.id} blog={blog}/>)}
 
