@@ -18,10 +18,6 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setURL] = useState('')
-
   const blogFormRef = useRef()
 
   useEffect(() => {
@@ -46,16 +42,18 @@ const App = () => {
         username, password
       })
 
+      setUser(user)
       blogService.setToken(user.token)
       window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
-      setUser(user)
-      setUsername('')
-      setPassword('')
     } catch (exception) {
+      console.log(exception)
       setErrorMessage('wrong username or password')
       setTimeout(() => {
         setErrorMessage(null)}, 5000)
     }
+
+    setPassword('')
+    setUsername('')
   }
 
   const handleLogout = event => {
@@ -64,27 +62,13 @@ const App = () => {
     setUser(null)
   }
 
-  const handleCreateNewBlog = async (event) => {
-    event.preventDefault()
-
+  const handleCreateNewBlog = async (newBlog) => {
     try {
-      const newBlog = {
-        title: title,
-        author: author,
-        url: url
-      }
+      blogFormRef.current.toggleVisibility()
+      const newBlogReturn = await blogService.createNewBlog(newBlog)
+      setBlogs(blogs.concat(newBlogReturn))
 
-      // TODO: ToggleVisiblity when use brackets it returns undefined object
-      // but when run withotu them it doesn't run - look at fixing this for 5.5
-      blogFormRef.current.toggleVisbility
-      await blogService.createNewBlog(newBlog)
-      await blogService.getAll().then(blogs => setBlogs( blogs ))
-
-      setTitle('')
-      setAuthor('')
-      setURL('')
-
-      setSucessMessage(`a new blog ${title} by ${author} added`)
+      setSucessMessage(`a new blog ${newBlog.title} by ${newBlog.author} added`)
       setTimeout(() => {
         setSucessMessage(null)}, 5000)
     } catch (exception) {
@@ -92,6 +76,16 @@ const App = () => {
       setTimeout(() => {
         setErrorMessage(null)}, 5000)
     }
+  }
+
+  const handleUpdatedBlog = async(updatedBlog) => {
+    const updatedBlogs = blogs.map(blog => blog.id === updatedBlog.id ? updatedBlog : blog)
+    setBlogs(updatedBlogs)
+  }
+
+  const handleDeletedBlog = async(deletedBlogId) => {
+    const updatedBlogs = blogs.filter(blog => blog.id !== deletedBlogId)
+    setBlogs(updatedBlogs)
   }
 
   if (user === null) {
@@ -116,19 +110,17 @@ const App = () => {
       <p>{user.name} is logged in <button onClick={handleLogout}>logout</button></p>
 
       <Togglable buttonLabel="Create New Blog" ref={blogFormRef}>
-        <NewBlogForm 
-          handleCreateNewBlog={handleCreateNewBlog} 
-          title={title} 
-          setTitle={setTitle} 
-          author={author}
-          setAuthor={setAuthor}
-          url={url}
-          setURL={setURL} />
-        </Togglable>
+        <NewBlogForm createNewBlog={handleCreateNewBlog} />
+      </Togglable>
 
       <br></br>
-      {blogs.map(blog => <Blog key={blog.id} blog={blog}/>)}
-
+      {blogs
+        .map(blog => <Blog key={blog.id} 
+          blog={blog} 
+          username={user.username} 
+          handleUpdatedBlog={handleUpdatedBlog}
+          handleDeletedBlog={handleDeletedBlog} />)
+        .sort((a,b) => a.props.blog.likes - b.props.blog.likes)}
     </div>
   )
 }
