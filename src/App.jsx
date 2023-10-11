@@ -78,8 +78,9 @@ const App = () => {
     }
   }
 
-  const handleUpdatedBlog = async(updatedBlog) => {
-    const updatedBlogs = blogs.map(blog => blog.id === updatedBlog.id ? updatedBlog : blog)
+  const handleUpdatedBlog = async (blogId, updatedBlog) => {
+    const updatedBlogResponse = await blogService.updateBlog(blogId, updatedBlog)
+    const updatedBlogs = blogs.map(blog => blog.id === updatedBlogResponse.id ? updatedBlogResponse : blog)
     setBlogs(updatedBlogs)
   }
 

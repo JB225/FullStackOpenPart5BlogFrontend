@@ -27,8 +27,7 @@ const Blog = ({ blog, username, handleUpdatedBlog, handleDeletedBlog }) => {
       url: blog.url
     }
 
-    const updatedBlogResponse = await blogService.updateBlog(blog.id, updatedBlog)
-    handleUpdatedBlog(updatedBlogResponse)
+    handleUpdatedBlog(blog.id, updatedBlog)
   }
 
   const handleDeleteBlog = async() => {
@@ -43,7 +42,7 @@ const Blog = ({ blog, username, handleUpdatedBlog, handleDeletedBlog }) => {
       <div>
         {blog.title}, {blog.author} <button onClick={toggleShowFullBlog}>{blogShown ? 'hide' : 'view'}</button>
       </div>
-      <div style={ShowWhenBlogShown}>
+      <div style={ShowWhenBlogShown} className='shownOnlyWhenShowTrue'>
         <div>{blog.url}</div>
         <div>likes {blog.likes} <button onClick={handleLikeBlog}>like</button></div>
         <div>{blog.user.name}</div>
