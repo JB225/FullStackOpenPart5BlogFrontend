@@ -1,10 +1,10 @@
-import { useState } from "react"
+import { useState } from 'react'
 import blogService from '../services/blogs'
 
 const Blog = ({ blog, username, handleUpdatedBlog, handleDeletedBlog }) => {
   const [blogShown, setBlogShown] = useState(false)
-  const ShowWhenBlogShown = { display: blogShown ? '' : 'none'}
-  const showDeleteButton = { display: username === blog.user.username ? '' : 'none'}
+  const ShowWhenBlogShown = { display: blogShown ? '' : 'none' }
+  const showDeleteButton = { display: username === blog.user.username ? '' : 'none' }
 
   const blogStyle = {
     paddingTop: 10,
@@ -50,6 +50,6 @@ const Blog = ({ blog, username, handleUpdatedBlog, handleDeletedBlog }) => {
         <div><button onClick={handleDeleteBlog} style={showDeleteButton}>delete</button></div>
       </div>
     </div>
-)}
+  )}
 
 export default Blog

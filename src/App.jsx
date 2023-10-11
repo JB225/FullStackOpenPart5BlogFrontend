@@ -22,7 +22,7 @@ const App = () => {
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
-      setBlogs( blogs ))  
+      setBlogs( blogs ))
   }, [])
 
   useEffect(() => {
@@ -91,17 +91,17 @@ const App = () => {
   if (user === null) {
     return (
       <div>
-        <LoginForm 
-          handleLogin={handleLogin} 
-          username={username} 
-          setUsername={setUsername} 
-          password={password} 
+        <LoginForm
+          handleLogin={handleLogin}
+          username={username}
+          setUsername={setUsername}
+          password={password}
           setPassword={setPassword}
           errorMessage={errorMessage}/>
       </div>
     )
   }
-  
+
   return (
     <div>
       <h2>blogs</h2>
@@ -115,9 +115,9 @@ const App = () => {
 
       <br></br>
       {blogs
-        .map(blog => <Blog key={blog.id} 
-          blog={blog} 
-          username={user.username} 
+        .map(blog => <Blog key={blog.id}
+          blog={blog}
+          username={user.username}
           handleUpdatedBlog={handleUpdatedBlog}
           handleDeletedBlog={handleDeletedBlog} />)
         .sort((a,b) => a.props.blog.likes - b.props.blog.likes)}
